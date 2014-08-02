@@ -13,7 +13,7 @@
 // Example usage: stablepartition<int>(list, isEven);, where list is a vector of ints and isEven
 // is a boolean function that accepts one int value as its function parameter.
 
-//-------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
 
 #include<iostream>
 #include<vector>
@@ -37,11 +37,17 @@ bool isEven(int value);
 
 bool firstHalf(char c);
 
-//-------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
 
-// Follows mergesort methodology of partitioning two elements, then partitioning 4 elements composed of 2 already partitioned 2-element subsets, then 8, etc.
-// Recursion is unwound and done 'in-order' to avoid having O(log n) recursive calls in-flight simultaneously (which would violate O(1) memory overhead goal).
-// In normal case (i.e., both subsets being merged are of lengths that are the appropriate power of 2 for the current cycle), finding the middle element is obvious.
+// Follows mergesort methodology of partitioning two elements, then partitioning 4 elements composed of 2
+// already partitioned 2-element subsets, then 8, etc.
+
+// Recursion is unwound and done 'in-order' to avoid having O(log n) recursive calls in-flight simultaneously
+// (which would violate O(1) memory overhead goal).
+
+// In normal case (i.e., both subsets being merged are of lengths that are the appropriate power of 2 for the
+// current cycle), finding the middle element is obvious.
+
 // For edge cases, the middle is found manually before passing the subsets to the merge function.
 template<typename T>
 void stablepartition(std::vector<T>& list, bool (&test)(T))
@@ -56,7 +62,8 @@ void stablepartition(std::vector<T>& list, bool (&test)(T))
 		// for each subset of size i in the list
 		for (int j = 0; j < last; j+=i)
 		{
-			// edge case, end of list does not contain a full i elements - different high, plus we must find the middle
+			// edge case, end of list does not contain a full i elements
+            // different high, plus we must find the middle
 			if ( (j+i-1) > last )
             {
                 low = j;
@@ -64,7 +71,7 @@ void stablepartition(std::vector<T>& list, bool (&test)(T))
                 
                 middle = -1;
                 // find middle (where there is a 'true' element to the right of a 'false' element)
-                // example: an even element to the right of an odd element when our partioning function is isEven.
+                // example: even element to the right of odd element when partioning function is isEven.
                 for (int k = low; k < high; k++)
                 {
                     if (!test(list[k]) && test(list[k+1]))
@@ -76,7 +83,7 @@ void stablepartition(std::vector<T>& list, bool (&test)(T))
                 
                 if (middle != -1)
                     merge(list, test, low, middle, high);
-                // if middle still = -1, this subset is already partitioned correctly so no merge call is necessary
+                // if middle still = -1, subset is already partitioned correctly so no merge call necessary
             }
             
 			// normal case
@@ -95,15 +102,15 @@ void stablepartition(std::vector<T>& list, bool (&test)(T))
 	}
 }
 
-// Function to merge two partitioned subsets into a larger partioned subset, with O(n) runtime and O(1) memory overhead.
+// Function to merge two partitioned subsets into larger partioned subset, with O(n) runtime and O(1) memory overhead.
 
 // Trivial in case where the number of 'false' values in subset 1 is equivalent to the number of 'true' values in subset 2:
-// just perform that number of 1-1 swaps. Call that number k; the window created by the indexes used is of size 2k, and k swaps are made.
+// just perform that number of 1-1 swaps. Call that number k; the window created by the indexes used is of size 2k, & k swaps made.
 
-// If not equivalent, perform a number of swaps equal to the smaller of those two numbers, and adjust the window size in the appropriate direction
-// to create a new subproblem. This process is iterated as many times as necessary until both sides of the window are equivalent, and such a final
-// case always occurs even if it is necessary to go down to a k=1 scenario. The total number of swaps is never more than the number of elements in
-// the two subsets.
+// If not equivalent, perform a number of swaps equal to the smaller of those two numbers, and adjust the window size in
+// the appropriate direction to create a new subproblem. This process is iterated as many times as necessary until both
+// sides of the window are equivalent, and such a final case always occurs even if it is necessary to go down to a k=1 scenario.
+// The total number of swaps is never more than the number of elements in the two subsets.
 template<typename T>
 void merge(std::vector<T>& list, bool (&test)(T), int low, int middle, int high)
 {
@@ -130,7 +137,7 @@ void merge(std::vector<T>& list, bool (&test)(T), int low, int middle, int high)
         {
             if (correctBeforeHere == movingFrontier)
                 movingFrontier=swapIndex;
-
+            
             swap(list, correctBeforeHere, swapIndex);
             correctBeforeHere++;
             swapIndex++;
@@ -166,13 +173,14 @@ bool firstHalf(char c)
         return false;
 }
 
-//-------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------
 
 int main()
 {
     srand((unsigned int)time(NULL));
     
     // Example usage 1 - int vector, partition based on whether values are even or odd
+    cout << "Partitioning of int vector, even | odd" << endl << endl;
     
     // Create test vector
     int size = 12;
@@ -183,6 +191,7 @@ int main()
         list[i] = rand() % 100;
     
     // print out starting vector for comparison with final partitioned vector
+    cout << "Original vector" << endl;
     for (int i = 0; i < list.size(); i++)
 		cout << list[i] << " ";
     cout << endl << endl;
@@ -191,31 +200,35 @@ int main()
     stablepartition<int>(list, isEven);
     
     // print out the new ordering to see that the even/odd partitioning has occurred
+    cout << "Partitioned vector" << endl;
     for (int i = 0; i < list.size(); i++)
 		cout << list[i] << " ";
-    
     cout << endl << endl;
     
-    //-------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------
     
     // Example usage 2 - char vector, partition based on whether chars are in the first half of the alphabet
     // or the second.
+    cout << "Partitioning of char vector, first half of alphabet | second half of alphabet" << endl << endl;
     
     int size2 = 15;
     vector<char> list2(size2);
+    
     for (int i = 0; i < list2.size(); i++)
         list2[i] = rand() % 26 + 65;
     
+    cout << "Original vector" << endl;
     for (int i = 0; i < list2.size(); i++)
         cout << list2[i] << " ";
     cout << endl << endl;
     
     stablepartition<char>(list2, firstHalf);
     
+    cout << "Partitioned vector" << endl;
     for (int i = 0; i < list2.size(); i++)
         cout << list2[i] << " ";
     cout << endl << endl;
     
     cin.get();
-    return 0;   
+    return 0;
 }
